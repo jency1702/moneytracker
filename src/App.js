@@ -1,78 +1,199 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
   const [name, setName] = useState("");
   const [datetime, setDateTime] = useState("");
   const [description, setDescription] = useState("");
-  function addNewTransactions(ev) {
+  const [amount, setAmount] = useState(""); // string initially for input handling
+  const [transactions, setTransactions] = useState([]); // store all transactions
+  const [editingId, setEditingId] = useState(null); // for edit mode
+
+  // Fetch transactions when the component loads
+  useEffect(() => {
+    async function fetchTransactions() {
+      try {
+        const response = await fetch(
+          process.env.REACT_APP_API_URL ||
+            "http://localhost:4040/api/transactions"
+        );
+        const data = await response.json();
+        setTransactions(data);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    }
+    fetchTransactions();
+  }, []);
+
+  async function addNewTransactions(ev) {
     ev.preventDefault();
 
-    const url = process.env.REACT_APP_API_URL + "/transaction";
-    console.log(url);
-    // fetch();
+    const transactionAmount = parseFloat(amount);
+    if (isNaN(transactionAmount)) {
+      alert("Please enter a valid number for the amount.");
+      return;
+    }
+
+    const url = editingId
+      ? `http://localhost:4040/api/transaction/${editingId}`
+      : "http://localhost:4040/api/transaction";
+    const method = editingId ? "PUT" : "POST";
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({
+          name,
+          description,
+          datetime,
+          amount: transactionAmount,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `${editingId ? "Update" : "Create"} failed: ${response.statusText}`
+        );
+      }
+
+      const json = await response.json();
+      console.log(`Transaction ${editingId ? "updated" : "created"}:`, json);
+
+      // Refetch transactions after update/create
+      const updatedTransactionsResponse = await fetch(
+        process.env.REACT_APP_API_URL ||
+          "http://localhost:4040/api/transactions"
+      );
+      const updatedTransactions = await updatedTransactionsResponse.json();
+      setTransactions(updatedTransactions);
+
+      // Reset form fields
+      setName("");
+      setDateTime("");
+      setDescription("");
+      setAmount("");
+      setEditingId(null);
+    } catch (error) {
+      console.error("Error saving transaction:", error);
+    }
   }
+
+  const deleteTransaction = async (id) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this transaction?"
+    );
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:4040/api/transaction/${id}`,
+        { method: "DELETE" }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete transaction");
+      }
+
+      // Remove deleted transaction from state
+      setTransactions(transactions.filter((t) => t._id !== id));
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+    }
+  };
+
+  const editTransaction = (transaction) => {
+    setName(transaction.name);
+    setDescription(transaction.description);
+    setDateTime(transaction.datetime.slice(0, 16)); // remove seconds
+    setAmount(transaction.amount);
+    setEditingId(transaction._id);
+  };
+
   return (
-    <main>
+    <main className="container">
       <h1>
-        $400<span>.00</span>
+        Money<span>Tracker</span>
       </h1>
-      <form onSubmit={addNewTransactions}>
-        <div className="basics">
-          <input
-            type="text"
-            value={name}
-            onChange={(ev) => setName(ev.target.value)}
-            placeholder={"+200 new samsung tv"}
-          />
-          <input
-            value={datetime}
-            onChange={(ev) => setDateTime(ev.target.value)}
-            type="datetime-local"
-          />
-        </div>
-        <div className="description">
-          <input
-            type="text"
-            value={description}
-            onChange={(ev) => setDescription(ev.target.value)}
-            placeholder={"description"}
-          />
-        </div>
-        <button type="submit">Add new Transaction</button>
-      </form>
-      <div className="transactions">
-        <div className="transaction">
-          <div className="left">
-            <div className="name">New Samsung Tv</div>
-            <div className="description">It was time for new TV</div>
-          </div>
-          <div className="right">
-            <div className="price red">-$500</div>
-            <div className="datetime">2022-12-18 15:45</div>
-          </div>
-        </div>
 
-        <div className="transaction">
-          <div className="left">
-            <div className="name">Gig job new website</div>
-            <div className="description">It was time for new TV</div>
+      <div className="left-panel">
+        <form onSubmit={addNewTransactions}>
+          <div className="basics">
+            <input
+              type="text"
+              value={name}
+              onChange={(ev) => setName(ev.target.value)}
+              placeholder={"+200 new samsung tv"}
+              required
+            />
+            <input
+              value={datetime}
+              onChange={(ev) => setDateTime(ev.target.value)}
+              type="datetime-local"
+              required
+            />
+            <input
+              type="number"
+              value={amount}
+              onChange={(ev) => setAmount(ev.target.value)}
+              placeholder={"Amount"}
+              required
+            />
           </div>
-          <div className="right">
-            <div className="price green">+$400</div>
-            <div className="datetime">2022-12-18 15:45</div>
-          </div>
-        </div>
 
-        <div className="transaction">
-          <div className="left">
-            <div className="name">Iphone</div>
-            <div className="description">It was time for new TV</div>
+          <div className="description">
+            <input
+              type="text"
+              value={description}
+              onChange={(ev) => setDescription(ev.target.value)}
+              placeholder={"description"}
+              required
+            />
           </div>
-          <div className="right">
-            <div className="price red">-$500</div>
-            <div className="datetime">2022-12-18 15:45</div>
-          </div>
+
+          <button type="submit">
+            {editingId ? "Update Transaction" : "Add new Transaction"}
+          </button>
+        </form>
+
+        <div className="transactions">
+          {transactions.length === 0 ? (
+            <p>No transactions added yet.</p>
+          ) : (
+            transactions.map((transaction) => (
+              <div key={transaction._id} className="transaction">
+                <div className="left">
+                  <div className="name">{transaction.name}</div>
+                  <div className="description">{transaction.description}</div>
+                </div>
+                <div className="right">
+                  <div
+                    className={`price ${
+                      transaction.amount < 0 ? "red" : "green"
+                    }`}
+                  >
+                    {transaction.amount < 0
+                      ? `-$${Math.abs(transaction.amount)}`
+                      : `+$${transaction.amount}`}
+                  </div>
+                  <div className="datetime">{transaction.datetime}</div>
+                  <button
+                    className="edit-btn"
+                    onClick={() => editTransaction(transaction)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => deleteTransaction(transaction._id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </main>

@@ -1,77 +1,165 @@
-* {
-  box-sizing: border-box;
-}
+/* General reset */
 body {
-  background-color: #17181f;
-  color: #ddd;
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f8ff; /* very light blue */
+  color: #1a202c;
 }
 
-main {
-  max-width: 360px;
-  margin: 30px auto;
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 128, 255, 0.15);
+  transition: 0.3s;
 }
 
 h1 {
   text-align: center;
-  color: #fff;
-  margin: 0;
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #2563eb;
+  margin-bottom: 20px;
 }
+
+h1 span {
+  color: #0ea5e9;
+}
+
+/* Form styling */
 form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.basics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.basics input,
+.description input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  outline: none;
+  font-size: 1rem;
+  background: #f8fbff;
+  transition: all 0.2s;
+}
+
+.basics input:focus,
+.description input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+  color: white;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #2563eb, #0284c7);
+  transform: translateY(-2px);
+}
+
+/* Transactions list */
+.transactions {
   margin-top: 20px;
 }
-form input {
-  width: 100%;
-  background-color: transparent;
-  color: #ddd;
-  border: 2px solid #30313d;
-  padding: 2px 5px;
-  border-radius: 5px;
-}
-form input[type="datetime-local"] {
-  color: #777;
-}
-form div.basics {
-  display: flex;
-  gap: 5px;
-  margin-bottom: 5px;
-}
-form button {
-  width: 100%;
-  margin-top: 5px;
-  border: 0;
-  border-radius: 5px;
-  padding: 5px;
-  background-color: #ddd;
-}
-div.transactions {
-  margin-top: 10px;
-}
-div.transaction {
+
+.transaction {
   display: flex;
   justify-content: space-between;
-  padding: 5px;
-  border-top: 1px solid #30313d;
+  align-items: center;
+  background: #f8fbff;
+  border: 1px solid #e2e8f0;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  transition: 0.3s;
 }
-div.transaction:first-child {
-  border-top: 0;
+
+.transaction:hover {
+  background: #e0f2fe;
+  transform: scale(1.01);
 }
-div.transaction div.name {
+
+.transaction .left .name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.transaction .left .description {
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.transaction .right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.price {
+  font-weight: bold;
   font-size: 1rem;
 }
-div.transaction div.description {
-  font-size: 0.7rem;
-  color: #888;
+
+.price.green {
+  color: #16a34a;
 }
-div.right {
-  text-align: right;
+
+.price.red {
+  color: #dc2626;
 }
-div.price.green {
-  color: #1c1;
+
+.datetime {
+  font-size: 0.8rem;
+  color: #64748b;
 }
-div.price.red {
-  color: #c11;
+
+/* Action buttons */
+.edit-btn,
+.delete-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: 0.3s;
 }
-div transaction div.datetime {
-  font-size: 0.7rem;
-  color: #888;
+
+.edit-btn {
+  background: #38bdf8;
+  color: white;
+}
+
+.edit-btn:hover {
+  background: #0284c7;
+}
+
+.delete-btn {
+  background: #f87171;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
 }
