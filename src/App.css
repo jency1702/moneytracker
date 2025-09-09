@@ -163,3 +163,61 @@ button:hover {
 .delete-btn:hover {
   background: #dc2626;
 }
+
+.income-summary {
+  background: #f0f9ff;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.income-summary h2 {
+  margin-bottom: 12px;
+  color: #2563eb;
+}
+
+.set-income {
+  margin-bottom: 15px;
+}
+
+.set-income input {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  margin-left: 8px;
+}
+
+.summary-cards {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+
+.summary-cards .card {
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight: bold;
+  color: white;
+  min-width: 120px;
+}
+
+.card.income {
+  background: #3b82f6;
+}
+
+.card.expense {
+  background: #ef4444;
+}
+
+.card.balance {
+  background: #10b981;
+}
+
+.charts {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
